@@ -13,6 +13,7 @@ import OrganizationProfile from "./pages/OrganizationProfile";
 import Search from "./pages/Search";
 import Login from "./pages/Login";
 import Pricing from "./pages/Pricing";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -22,17 +23,19 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/consultant/register" element={<ConsultantRegister />} />
-          <Route path="/organization/register" element={<OrganizationRegister />} />
-          <Route path="/consultant/profile" element={<ConsultantProfile />} />
-          <Route path="/organization/profile" element={<OrganizationProfile />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/consultant/register" element={<ConsultantRegister />} />
+            <Route path="/organization/register" element={<OrganizationRegister />} />
+            <Route path="/consultant/profile" element={<ConsultantProfile />} />
+            <Route path="/organization/profile" element={<OrganizationProfile />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

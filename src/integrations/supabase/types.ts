@@ -9,7 +9,102 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      consultant_profiles: {
+        Row: {
+          availability: boolean | null
+          created_at: string
+          email: string
+          expertise: string[] | null
+          first_name: string
+          geographical_area: string[] | null
+          id: string
+          last_name: string
+          rate: number | null
+          rate_type: string | null
+          updated_at: string
+        }
+        Insert: {
+          availability?: boolean | null
+          created_at?: string
+          email: string
+          expertise?: string[] | null
+          first_name: string
+          geographical_area?: string[] | null
+          id: string
+          last_name: string
+          rate?: number | null
+          rate_type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          availability?: boolean | null
+          created_at?: string
+          email?: string
+          expertise?: string[] | null
+          first_name?: string
+          geographical_area?: string[] | null
+          id?: string
+          last_name?: string
+          rate?: number | null
+          rate_type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      organization_profiles: {
+        Row: {
+          contact_name: string | null
+          contact_title: string | null
+          created_at: string
+          email: string
+          id: string
+          industry: string | null
+          organization_name: string
+          size: string | null
+          updated_at: string
+        }
+        Insert: {
+          contact_name?: string | null
+          contact_title?: string | null
+          created_at?: string
+          email: string
+          id: string
+          industry?: string | null
+          organization_name: string
+          size?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contact_name?: string | null
+          contact_title?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          industry?: string | null
+          organization_name?: string
+          size?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_types: {
+        Row: {
+          created_at: string
+          id: string
+          type: Database["public"]["Enums"]["user_type"]
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          type: Database["public"]["Enums"]["user_type"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          type?: Database["public"]["Enums"]["user_type"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +113,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_type: "consultant" | "organization"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +228,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_type: ["consultant", "organization"],
+    },
   },
 } as const

@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
 
 const ConsultantRegister = () => {
   const [formData, setFormData] = useState({
@@ -19,6 +21,13 @@ const ConsultantRegister = () => {
     termsAccepted: false,
   });
 
+  const { signUp, loading, user } = useAuth();
+
+  // Redirect if user is already logged in
+  if (user) {
+    return <Navigate to="/consultant/profile" />;
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -27,18 +36,24 @@ const ConsultantRegister = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In Phase 1, we'll just log the registration data
-    console.log(formData);
-    // In a real implementation, we would handle registration and redirect to profile creation
+    
+    await signUp({
+      email: formData.email,
+      password: formData.password,
+      userType: 'consultant',
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+    });
   };
 
   const isDisabled = !formData.termsAccepted || 
     formData.password !== formData.confirmPassword ||
     !formData.firstName ||
     !formData.lastName ||
-    !formData.email;
+    !formData.email ||
+    loading;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -70,6 +85,7 @@ const ConsultantRegister = () => {
                       value={formData.firstName}
                       onChange={handleChange}
                       required
+                      disabled={loading}
                     />
                   </div>
                   <div className="space-y-2">
@@ -80,6 +96,7 @@ const ConsultantRegister = () => {
                       value={formData.lastName}
                       onChange={handleChange}
                       required
+                      disabled={loading}
                     />
                   </div>
                 </div>
@@ -94,6 +111,7 @@ const ConsultantRegister = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
+                    disabled={loading}
                   />
                 </div>
 
@@ -107,6 +125,7 @@ const ConsultantRegister = () => {
                       value={formData.password}
                       onChange={handleChange}
                       required
+                      disabled={loading}
                     />
                   </div>
                   <div className="space-y-2">
@@ -118,6 +137,7 @@ const ConsultantRegister = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required
+                      disabled={loading}
                     />
                     {formData.password !== formData.confirmPassword && formData.confirmPassword && (
                       <p className="text-sm text-red-500">Passwords do not match</p>
@@ -132,6 +152,7 @@ const ConsultantRegister = () => {
                     checked={formData.termsAccepted}
                     onCheckedChange={(checked) => 
                       setFormData({...formData, termsAccepted: checked === true})}
+                    disabled={loading}
                   />
                   <label
                     htmlFor="termsAccepted"
@@ -149,7 +170,14 @@ const ConsultantRegister = () => {
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isDisabled}>
-                  Create Account
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Account...
+                    </>
+                  ) : (
+                    "Create Account"
+                  )}
                 </Button>
 
                 <div className="text-center text-sm">

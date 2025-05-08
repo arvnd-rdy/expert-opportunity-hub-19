@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
 
 const OrganizationRegister = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +24,13 @@ const OrganizationRegister = () => {
     confirmPassword: "",
     termsAccepted: false,
   });
+
+  const { signUp, loading, user } = useAuth();
+
+  // Redirect if user is already logged in
+  if (user) {
+    return <Navigate to="/organization/profile" />;
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -38,17 +47,22 @@ const OrganizationRegister = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In Phase 1, we'll just log the registration data
-    console.log(formData);
-    // In a real implementation, we would handle registration and redirect to profile creation
+    
+    await signUp({
+      email: formData.email,
+      password: formData.password,
+      userType: 'organization',
+      organizationName: formData.organizationName,
+    });
   };
 
   const isDisabled = !formData.termsAccepted || 
     formData.password !== formData.confirmPassword ||
     !formData.organizationName ||
-    !formData.email;
+    !formData.email ||
+    loading;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -79,6 +93,7 @@ const OrganizationRegister = () => {
                     value={formData.organizationName}
                     onChange={handleChange}
                     required
+                    disabled={loading}
                   />
                 </div>
 
@@ -88,6 +103,7 @@ const OrganizationRegister = () => {
                     <Select 
                       onValueChange={(value) => handleSelectChange("industry", value)}
                       value={formData.industry}
+                      disabled={loading}
                     >
                       <SelectTrigger id="industry">
                         <SelectValue placeholder="Select industry" />
@@ -109,6 +125,7 @@ const OrganizationRegister = () => {
                     <Select 
                       onValueChange={(value) => handleSelectChange("size", value)}
                       value={formData.size}
+                      disabled={loading}
                     >
                       <SelectTrigger id="size">
                         <SelectValue placeholder="Select size" />
@@ -133,6 +150,7 @@ const OrganizationRegister = () => {
                       name="contactName"
                       value={formData.contactName}
                       onChange={handleChange}
+                      disabled={loading}
                     />
                   </div>
                   <div className="space-y-2">
@@ -142,6 +160,7 @@ const OrganizationRegister = () => {
                       name="contactTitle"
                       value={formData.contactTitle}
                       onChange={handleChange}
+                      disabled={loading}
                     />
                   </div>
                 </div>
@@ -156,6 +175,7 @@ const OrganizationRegister = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
+                    disabled={loading}
                   />
                 </div>
 
@@ -169,6 +189,7 @@ const OrganizationRegister = () => {
                       value={formData.password}
                       onChange={handleChange}
                       required
+                      disabled={loading}
                     />
                   </div>
                   <div className="space-y-2">
@@ -180,6 +201,7 @@ const OrganizationRegister = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required
+                      disabled={loading}
                     />
                     {formData.password !== formData.confirmPassword && formData.confirmPassword && (
                       <p className="text-sm text-red-500">Passwords do not match</p>
@@ -194,6 +216,7 @@ const OrganizationRegister = () => {
                     checked={formData.termsAccepted}
                     onCheckedChange={(checked) => 
                       setFormData({...formData, termsAccepted: checked === true})}
+                    disabled={loading}
                   />
                   <label
                     htmlFor="termsAccepted"
@@ -211,7 +234,14 @@ const OrganizationRegister = () => {
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isDisabled}>
-                  Create Organization Account
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Organization Account...
+                    </>
+                  ) : (
+                    "Create Organization Account"
+                  )}
                 </Button>
 
                 <div className="text-center text-sm">
